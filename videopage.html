@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youtube Video Page</title>
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="play.css">
+    <script src="https://kit.fontawesome.com/9878c95b8d.js" crossorigin="anonymous"></script>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="https://www.youtube.com/s/desktop/2ecd39d3/img/favicon_48x48.png" sizes="48x48">
+   
+</head>
+<body>
+    <div id="nav"></div>
+
+    <div class="container">
+        <div id="left">
+            <iframe id="iframe" src="" frameborder="0"></iframe>
+            <p class="title"></p>
+            <div class="btitle">
+                <div class="vd">
+                    <p id="views" id="v" >3,72,379 views</p>
+                    <p id="v">05-Oct-2021</p>
+                </div>
+                <div class="vd">
+                    <div class="vd">
+                        <span class="material-icons-outlined"> thumb_up </span>
+                        <p>12K</p>
+                    </div>
+                    <div class="vd">
+                        <span class="material-icons-outlined"> thumb_down</span>
+                        <p>DISLIKE</p>
+                    </div>
+                    <div class="vd">
+                        <i class="fas fa-share"></i>
+                        <p>SHARE</p>
+                    </div>
+                    <div class="vd">
+                        <span class="material-icons-outlined">playlist_add</span>
+                        <p>SHARE</p>
+                    </div>
+                    <div class="vd" id="lastvd">
+                        <span class="material-icons-outlined">more_horiz</span>
+                    </div>
+
+                </div>
+            </div>
+            <hr>
+            <div class="det">
+                <div>
+                    <img id="clogo">
+                </div>
+                <div>
+                    <p id="cname" ></p>
+                    <p id="scname">6.38 lakh subscribers</p>
+                    <p id="desc"  ></p>
+                    
+                </div>
+                <div id="subs">SUBSCRIBE</div>
+            </div>
+            <div>
+                <!-- <p>5,12,08,234 views : Premiered on 16-Apr-2021</p> -->
+            </div>
+        </div>
+        <div id="right"></div>
+    </div>
+</body>
+</html>
+
+<script type="module">
+
+
+    let api = "AIzaSyDGlV9AayRbSLr90TJ7e6NqdyTKtLSQAyE";
+    import nav from "./nav.js";
+    document.getElementById("nav").innerHTML = nav();
+
+    let username = JSON.parse(localStorage.getItem("name"));
+
+    if(username!==null){
+        console.log(username)
+        let pname =document.getElementById("userName");
+        pname.style.color = "black"
+        pname.textContent = username;
+    }
+
+
+    var data = JSON.parse(localStorage.getItem("video"));
+    // console.log(data);
+
+    let frame = document.getElementById("iframe");
+    // console.log(data.id.videoId)
+    frame.src = `https://www.youtube.com/embed/${data.id.videoId}`
+
+    let title = document.querySelector(".title");
+    title.textContent = data.snippet.title;
+    // console.log(data.snippet.title)
+
+    let cname = document.getElementById("cname");
+    cname.textContent = data.snippet.channelTitle;
+
+    let des = document.getElementById("desc");
+    desc.textContent = data.snippet.description;
+    // console.log(data.snippet.description);
+
+    let curl = JSON.parse(localStorage.getItem("curl"))
+    let clogo = document.getElementById("clogo");
+    clogo.src =curl
+    // console.log(curl);
+
+    let temp = await related(data.snippet.title)
+    // console.log(temp.items)
+    // localStorage.setItem("itemstemp", JSON.stringify(temp.items));
+    // var local = JSON.parse(localStorage.getItem("itemstemp"))
+    // display(local)
+    display(temp.items)
+
+    async function related(input){
+        // console.log(input)
+        let res = await fetch(`https://youtube.googleapis.com/youtube/v3/search?q=${input}&key=${api}&type=video&maxResults=14&part=snippet`);
+        let data = await res.json();
+        data.items.shift()
+        // console.log(data);
+        return data;
+ 
+    }
+ 
+    function display(arr){
+        console.log("inside", arr)
+        arr.forEach((item)=>{
+            let div = document.createElement("div");
+            div.id = "box"
+            // let frame = document.createElement("iframe");
+            let frame = document.createElement("img");
+            frame.id = "sframe"
+            // let temp = item.snippet.thumbnails.medium.url;
+            // console.log(temp)
+            frame.src = item.snippet.thumbnails.medium.url;
+            let right = document.createElement("div");
+            right.id = "rbox"
+            let title = document.createElement("p");
+            title.id = "stitle"
+            title.textContent = item.snippet.title;
+            let cname = document.createElement("p");
+            cname.id = "scname"
+            cname.textContent = item.snippet.channelTitle;
+            right.append(title, cname);
+            div.append(frame, right);
+            document.getElementById("right").append(div);
+            
+
+        })
+    }
+</script>

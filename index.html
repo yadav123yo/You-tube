@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youtube Homepage</title>
+    <link rel="stylesheet" href="inx.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://kit.fontawesome.com/9878c95b8d.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="https://www.youtube.com/s/desktop/2ecd39d3/img/favicon_48x48.png" sizes="48x48">
+  
+</head>
+<body>
+    <div id="nav"></div>
+    <div class="navbar">
+
+        <div id="menulogo">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <div class="logodiv">
+            <img id="navlogo" src="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg" alt="">
+        </div>
+
+        <p class="in">IN</p>
+
+        <div class="inputbox">
+            <input type="text" oninput="debounce(print, 800)" placeholder="Search" id="search">
+            <div class="sdiv">
+                <i id="search" onclick="searchmovies()" class="fas fa-search"></i>
+            </div>
+            <div class="micro">
+                <i class="fas fa-microphone"></i>
+            </div>
+        </div>
+
+        <div class="box9">
+            <img id="box9" src="https://cdn-icons-png.flaticon.com/512/80/80975.png" alt="">
+        </div>
+        
+        <div class="dot3">
+            <i class="fas fa-ellipsis-v"></i>
+        </div>
+
+        <div class="userbox">
+            <i class="far fa-user-circle"></i>
+            <p id="userName" >SIGN IN</p>
+        </div>
+        
+    </div>
+    <div id="temp">
+        </div> -->
+    </div>
+
+    <div id="sResult"></div>
+
+
+    <div class="leftDiv">
+        <div class="homediv">
+            <i class="fas fa-home"></i>
+            <p>Home</p>
+        </div>
+
+        <div class="homediv" id="compass">
+            <i class="far fa-compass"></i>
+            <p>Explore</p>
+        </div>
+
+        <div class="homediv" id="compass">
+            <span class="material-icons-outlined">
+                subscriptions
+                </span>
+                
+            <p>Subscription</p>
+        </div>
+
+        <div class="homediv" id="compass">
+            <span class="material-icons-outlined">video_library </span>
+            <p>Library</p>
+        </div>
+
+        <div class="homediv" id="lastdiv">
+            <span class="material-icons-outlined">history</span>
+            <p>History</p>
+        </div>
+        
+    </div>
+</body>
+</html>
+
+<script>
+    let api = "AIzaSyBT4VQgFejm24f28pjcfp6iI5Ye2HTSNSg";    
+
+    // channel url https://www.googleapis.com/youtube/v3/channels
+
+
+    let username = JSON.parse(localStorage.getItem("name"));
+
+    if(username!==null){
+        let pname =document.getElementById("userName");
+        pname.style.color = "black"
+        pname.textContent = username;
+    }
+
+    function print(){
+        var input = document.getElementById("search").value;
+        console.log(input)
+        search()
+    }
+
+
+    var run;
+    function debounce(func, delay){
+        clearTimeout(run)
+
+        run = setTimeout(function(){
+            func();
+        }, delay)
+    }
+
+    async function search(){
+        let input = document.getElementById("search").value;
+        
+        let res = await fetch(`https://youtube.googleapis.com/youtube/v3/search?q=${input}&key=${api}&type=video&maxResults=30&part=snippet`);
+
+        let data = await res.json();
+
+        let array_of_videos = data.items;
+        console.log(array_of_videos)
+        showSearch(array_of_videos)
+        
+    }
+
+    function showSearch(arr){
+        console.log("Print Hello");
+        let bdiv = document.getElementById("sResult");
+        bdiv.style.display = "block"
+        arr.forEach(async (item, index)=>{
+            let logoUrl = await channel(item.snippet.channelId)
+            let div = document.createElement("div");
+            div.id = "stitle"
+            let title = document.createElement("p");
+            title.textContent = item.snippet.title;
+            div.append(title);
+            bdiv.append(div);
+            div.addEventListener("click", function(){
+                // console.log(item)
+                set(item , logoUrl);
+            })
+        })
+        
+        
+    }
+    
+
+    async function searchmovies(){
+        console.log("searchMovies")
+        let input = document.getElementById("search").value;
+        
+        let res = await fetch(`https://youtube.googleapis.com/youtube/v3/search?q=${input}&key=${api}&type=video&maxResults=40&part=snippet`);
+
+        let data = await res.json();
+        console.log(data)
+
+        let array_of_videos = data.items;
+        console.log(array_of_videos)
+        display(array_of_videos)
+    }
+
+    searchdefault()
+
+    async function searchdefault(){
+        console.log("searchMovies")
+        
+        let res = await fetch(`https://youtube.googleapis.com/youtube/v3/search?q=trendingsongs&key=${api}&type=video&maxResults=40&part=snippet`);
+
+        let data = await res.json();
+        console.log(data)
+
+        let array_of_videos = data.items;
+        console.log(array_of_videos)
+        display(array_of_videos)
+    }
+
+    function display(arr){
+        // console.log(arr)
+        let bdiv = document.getElementById("sResult");
+        bdiv.style.display = "none"
+        document.getElementById("temp").innerHTML = null
+        arr.forEach(async (item, index) => {
+             var curl = await channel(item.snippet.channelId)
+             
+            //  console.log(curl)
+
+            //  let boxdet = item;
+            //  console.log(boxdet)
+            let div = document.createElement("div");
+            div.id = "box"
+            div.addEventListener("click", function(){
+                // console.log(item)
+                set(item , curl);
+            })
+
+
+            div.innerHTML = `
+            <div id="box">
+            <img id="poster" src="${item.snippet.thumbnails.medium.url}" alt="">
+            <div class="dis">
+                <div>
+                    <img id="clogo" src="${curl}"  alt="">
+                </div>
+                <div id="name" >
+                    <p class = "name">${item.snippet.title}</p>
+                    <p class="cname">${item.snippet.channelTitle}</p>
+                </div>
+            </div>
+           
+        </div>`;
+        
+        document.getElementById("temp").append(div)
+        });
+    }
+
+    async function channel(id){
+        // console.log("Hello");
+        let res = await fetch(`https://www.googleapis.com/youtube/v3/channels?id=${id}&key=${api}&type=video&part=snippet`);
+
+        let data = await res.json()
+        console.log(data.items[0].snippet, "inside")
+        return data.items[0].snippet.thumbnails.medium.url;
+    }
+
+    let userbox = document.querySelector(".userbox").addEventListener("click", goto);
+    function goto(){
+        window.location.href = "login.html"
+    }
+
+    function set(item, curl){
+        // console.log(item, curl)
+        localStorage.setItem("video", JSON.stringify(item));
+        localStorage.setItem("curl", JSON.stringify(curl));
+        window.location.href = "videopage.html"
+    }
+</script>
